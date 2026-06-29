@@ -12,11 +12,21 @@ class RouteDetailScreen extends StatefulWidget {
 }
 
 class _RouteDetailScreenState extends State<RouteDetailScreen> {
+  int? _routeId;
+  bool _loaded = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final routeId = ModalRoute.of(context)?.settings.arguments as int;
-    context.read<RoutesProvider>().loadRouteDetail(routeId);
+    final routeId = ModalRoute.of(context)?.settings.arguments as int?;
+    if (routeId != null && routeId != _routeId) {
+      _routeId = routeId;
+      _loaded = false;
+    }
+    if (!_loaded && _routeId != null) {
+      _loaded = true;
+      context.read<RoutesProvider>().loadRouteDetail(_routeId!);
+    }
   }
 
   @override
