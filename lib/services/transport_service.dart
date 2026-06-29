@@ -77,6 +77,14 @@ class TransportService {
     }
   }
 
+  Future<void> deleteIncident(int id) async {
+    try {
+      await _api.delete('/api/incidents/incidents/$id/');
+    } on DioException catch (e) {
+      throw Exception(_parseError(e.response?.data));
+    }
+  }
+
   Future<List<NotificationModel>> getNotifications() async {
     try {
       final response = await _api.get('/api/notifications/notifications/');

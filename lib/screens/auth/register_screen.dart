@@ -24,19 +24,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _register() {
+  Future<void> _register() async {
     if (_passwordCtrl.text != _confirmCtrl.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Las contraseñas no coinciden')),
       );
       return;
     }
-    context.read<AuthProvider>().clearError();
-    Navigator.pushNamed(context, '/login');
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.register(
+      _usernameCtrl.text.trim(),
+      _emailCtrl.text.trim(),
+      _passwordCtrl.text,
+    );
+    if (ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registro exitoso. Inicia sesión.')),
+      );
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Registrarse')),
       body: Center(
@@ -54,6 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                 ),
+                enabled: !auth.isLoading,
               ),
               const SizedBox(height: 12),
               TextField(
@@ -64,6 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
+                enabled: !auth.isLoading,
               ),
               const SizedBox(height: 12),
               TextField(
@@ -74,6 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   prefixIcon: Icon(Icons.lock),
                   border: OutlineInputBorder(),
                 ),
+                enabled: !auth.isLoading,
               ),
               const SizedBox(height: 12),
               TextField(
@@ -84,14 +99,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   prefixIcon: Icon(Icons.lock),
                   border: OutlineInputBorder(),
                 ),
+                enabled: !auth.isLoading,
               ),
+              if (auth.error != null) ...[
+                const SizedBox(height: 8),
+                Text(auth.error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              ],
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _register,
-                  child: const Text('Registrarse'),
+                  onPressed: auth.isLoading ? null : _register,
+                  child: auth.isLoading
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text('Registrarse'),
                 ),
               ),
               const SizedBox(height: 16),

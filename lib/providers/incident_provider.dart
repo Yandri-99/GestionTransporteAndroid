@@ -57,6 +57,17 @@ class IncidentProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteIncident(int id) async {
+    try {
+      await _service.deleteIncident(id);
+      _successMessage = 'Incidencia eliminada';
+      await loadIncidents();
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+    }
+  }
+
   void clearMessages() {
     _error = null;
     _successMessage = null;

@@ -27,6 +27,21 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
     final provider = context.watch<IncidentProvider>();
     final isAdmin = context.watch<AuthProvider>().isAdmin;
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (provider.successMessage != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(provider.successMessage!), backgroundColor: Colors.green),
+        );
+        provider.clearMessages();
+      }
+      if (provider.error != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(provider.error!), backgroundColor: Colors.red),
+        );
+        provider.clearMessages();
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Incidencias'),
@@ -72,8 +87,23 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
           incident: incident,
           isAdmin: isAdmin,
           onResolve: () => provider.resolveIncident(incident.id),
+          onDelete: () => _confirmDelete(context, provider, incident),
         );
       },
+    );
+  }
+
+  void _confirmDelete(BuildContext context, IncidentProvider provider, Incident incident) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar incidencia'),
+        content: Text('¿Eliminar "${incident.incidentTypeName}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          FilledButton(onPressed: () { Navigator.pop(ctx); provider.deleteIncident(incident.id); }, child: const Text('Eliminar')),
+        ],
+      ),
     );
   }
 }
@@ -82,11 +112,13 @@ class _IncidentCard extends StatelessWidget {
   final Incident incident;
   final bool isAdmin;
   final VoidCallback onResolve;
+  final VoidCallback onDelete;
 
   const _IncidentCard({
     required this.incident,
     required this.isAdmin,
     required this.onResolve,
+    required this.onDelete,
   });
 
   @override
@@ -137,11 +169,24 @@ class _IncidentCard extends StatelessWidget {
                       color: incident.status == 'resolved' ? Colors.grey : severityColor,
                       fontSize: 12,
                     )),
-                if (incident.status != 'resolved' && isAdmin)
-                  FilledButton.tonal(
-                    onPressed: onResolve,
-                    child: const Text('Resolver'),
-                  ),
+                Row(
+                  children: [
+                    if (incident.status != 'resolved' && isAdmin)
+                      FilledButton.tonal(
+                        onPressed: onResolve,
+                        child: const Text('Resolver'),
+                      ),
+                    if (isAdmin) ...[
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 20),
+                        color: theme.colorScheme.error,
+                        onPressed: onDelete,
+                        tooltip: 'Eliminar',
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ],

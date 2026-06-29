@@ -45,7 +45,4 @@ app.*.map.json
 /android/app/release
 
 # Backend (separate repo reference)
-/backend/logs/
-/backend/.env
-/backend/*.pyc
-/backend/__pycache__/
+/backend/
