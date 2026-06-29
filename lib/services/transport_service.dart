@@ -7,10 +7,16 @@ import 'api_service.dart';
 class TransportService {
   final ApiService _api = ApiService();
 
+  List<T> _extractResults<T>(dynamic data, T Function(Map<String, dynamic>) fromJson) {
+    if (data is! Map) return (data as List).map((e) => fromJson(e as Map<String, dynamic>)).toList();
+    final items = data['results'] ?? data['value'] ?? data as List;
+    return (items as List).map((e) => fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   Future<List<RouteModel>> getPublicRoutes() async {
     try {
       final response = await _api.get('/api/public/routes/');
-      return (response.data as List).map((e) => RouteModel.fromJson(e)).toList();
+      return _extractResults(response.data, RouteModel.fromJson);
     } on DioException catch (e) {
       throw Exception('Error al cargar rutas: ${e.message}');
     }
@@ -19,7 +25,7 @@ class TransportService {
   Future<List<BusStop>> getRouteStops(int routeId) async {
     try {
       final response = await _api.get('/api/public/routes/$routeId/stops/');
-      return (response.data as List).map((e) => BusStop.fromJson(e)).toList();
+      return _extractResults(response.data, BusStop.fromJson);
     } on DioException catch (e) {
       throw Exception('Error al cargar paradas: ${e.message}');
     }
@@ -29,9 +35,7 @@ class TransportService {
     try {
       final response =
           await _api.get('/api/public/routes/$routeId/coordinates/');
-      return (response.data as List)
-          .map((e) => RouteCoordinate.fromJson(e))
-          .toList();
+      return _extractResults(response.data, RouteCoordinate.fromJson);
     } on DioException catch (e) {
       throw Exception('Error al cargar coordenadas: ${e.message}');
     }
@@ -40,7 +44,7 @@ class TransportService {
   Future<List<BusStop>> getPublicBusStops() async {
     try {
       final response = await _api.get('/api/public/bus-stops/');
-      return (response.data as List).map((e) => BusStop.fromJson(e)).toList();
+      return _extractResults(response.data, BusStop.fromJson);
     } on DioException catch (e) {
       throw Exception('Error al cargar paradas: ${e.message}');
     }
@@ -53,9 +57,7 @@ class TransportService {
       if (severity != null) params['severity'] = severity;
 
       final response = await _api.get('/api/incidents/incidents/', params: params);
-      final data = response.data;
-      final results = data is Map ? data['results'] as List : data as List;
-      return results.map((e) => Incident.fromJson(e)).toList();
+      return _extractResults(response.data, Incident.fromJson);
     } on DioException catch (e) {
       throw Exception('Error al cargar incidentes: ${e.message}');
     }
@@ -88,9 +90,7 @@ class TransportService {
   Future<List<NotificationModel>> getNotifications() async {
     try {
       final response = await _api.get('/api/notifications/notifications/');
-      final data = response.data;
-      final results = data is Map ? data['results'] as List : data as List;
-      return results.map((e) => NotificationModel.fromJson(e)).toList();
+      return _extractResults(response.data, NotificationModel.fromJson);
     } on DioException catch (e) {
       throw Exception('Error al cargar notificaciones: ${e.message}');
     }
