@@ -7,7 +7,6 @@ Aplicación móvil Flutter para consulta de rutas y gestión de incidencias del 
 - Flutter SDK ^3.12.0
 - Dart SDK ^3.12.0
 - Dispositivo Android (API 21+) o emulador
-- Backend Django corriendo (ver [API](#api))
 
 ## Instalación
 
