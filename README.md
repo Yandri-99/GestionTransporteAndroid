@@ -7,6 +7,7 @@ Aplicación móvil Flutter para consulta de rutas y gestión de incidencias del 
 - Flutter SDK ^3.12.0
 - Dart SDK ^3.12.0
 - Dispositivo Android (API 21+) o emulador
+- Backend Django corriendo
 
 ## Instalación
 
@@ -26,24 +27,26 @@ flutter run
 
 ### URL de la API
 
-Editar `lib/config/api_config.dart`:
+Editar `lib/config/api_config.dart` y elegir la URL según el escenario:
 
 ```dart
-class ApiConfig {
-  static const String baseUrl = 'http://10.0.2.2:8000';  // Emulador Android
-  // static const String baseUrl = 'http://192.168.x.x:8000';  // Dispositivo físico (WiFi)
-}
+// Local (USB/ADB reverse): adb reverse tcp:8000 tcp:8000
+static const String baseUrl = 'http://localhost:8000';
+
+// Producción (DigitalOcean - prender VM primero)
+// static const String baseUrl = 'https://tanqueno-produccion.uaeftt-ute.site';
 ```
 
 | Escenario | URL |
 |-----------|-----|
+| Local (USB/ADB reverse) | `http://localhost:8000` |
 | Emulador Android | `http://10.0.2.2:8000` |
-| Dispositivo físico (USB/WiFi) | `http://<IP-local-PC>:8000` |
-| iOS Simulator | `http://localhost:8000` |
+| Dispositivo físico (WiFi) | `http://<IP-local-PC>:8000` |
+| Producción | `https://tanqueno-produccion.uaeftt-ute.site` |
 
-### Backend (Django)
+### Backend (Django) — Local
 
-El backend debe estar corriendo en `http://localhost:8000`:
+El backend debe estar corriendo:
 
 ```bash
 cd backend

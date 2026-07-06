@@ -205,9 +205,11 @@ class CreateIncidentScreen extends StatefulWidget {
 
 class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
   final _descCtrl = TextEditingController();
-  String _severity = 'medium';
   final _latCtrl = TextEditingController(text: '-0.1694');
   final _lngCtrl = TextEditingController(text: '-78.4779');
+  String _severity = 'medium';
+  int _incidentTypeId = 1;
+  final _types = {1: 'Accidente', 2: 'Falla Mecánica', 3: 'Retraso'};
 
   @override
   void dispose() {
@@ -220,7 +222,7 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
   void _submit() {
     final incident = Incident(
       id: 0,
-      tripId: 0,
+      incidentTypeId: _incidentTypeId,
       description: _descCtrl.text.trim(),
       severity: _severity,
       latitude: double.tryParse(_latCtrl.text) ?? 0,
@@ -244,6 +246,21 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Reportar una incidencia en la ruta'),
+            const SizedBox(height: 16),
+            const Text('Tipo de Incidencia'),
+            const SizedBox(height: 8),
+            Row(
+              children: _types.entries.map((e) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(e.value),
+                    selected: _incidentTypeId == e.key,
+                    onSelected: (_) => setState(() => _incidentTypeId = e.key),
+                  ),
+                );
+              }).toList(),
+            ),
             const SizedBox(height: 16),
             const Text('Severidad'),
             const SizedBox(height: 8),

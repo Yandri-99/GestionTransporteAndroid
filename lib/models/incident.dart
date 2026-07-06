@@ -1,6 +1,7 @@
 class Incident {
   final int id;
   final int tripId;
+  final int incidentTypeId;
   final String incidentTypeName;
   final String description;
   final String severity;
@@ -11,7 +12,8 @@ class Incident {
 
   Incident({
     required this.id,
-    required this.tripId,
+    this.tripId = 1,
+    this.incidentTypeId = 1,
     this.incidentTypeName = '',
     this.description = '',
     this.severity = 'medium',
@@ -24,7 +26,8 @@ class Incident {
   factory Incident.fromJson(Map<String, dynamic> json) {
     return Incident(
       id: json['id'],
-      tripId: json['trip'] ?? 0,
+      tripId: json['trip'] ?? 1,
+      incidentTypeId: json['incident_type'] ?? 1,
       incidentTypeName: json['incident_type_name'] ?? '',
       description: json['description'] ?? '',
       severity: json['severity'] ?? 'medium',
@@ -36,8 +39,8 @@ class Incident {
   }
 
   Map<String, dynamic> toJson() => {
-    'trip': tripId,
-    'incident_type': 1,
+    'trip': tripId > 0 ? tripId : 1,
+    'incident_type': incidentTypeId,
     'latitude': latitude.toString(),
     'longitude': longitude.toString(),
     'description': description,
