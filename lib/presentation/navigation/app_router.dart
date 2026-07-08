@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+import '../screens/public/home_screen.dart';
+import '../screens/public/routes_screen.dart';
+import '../screens/public/route_detail_screen.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/register_screen.dart';
+import '../screens/admin/admin_home_screen.dart';
+import '../screens/admin/incidents_screen.dart';
+import '../screens/notifications/notifications_screen.dart';
+import '../widgets/auth_guard.dart';
+
+class AppRouter {
+  static const String home = '/';
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String routesPath = '/routes';
+  static const String routeDetail = '/route_detail';
+  static const String admin = '/admin';
+  static const String incidents = '/incidents';
+  static const String createIncident = '/create_incident';
+  static const String notifications = '/notifications';
+
+  static Map<String, WidgetBuilder> get routeMap {
+    return {
+      home: (context) => const HomeScreen(),
+      login: (context) => const LoginScreen(),
+      register: (context) => const RegisterScreen(),
+      routesPath: (context) => const RoutesScreen(),
+      routeDetail: (context) => const RouteDetailScreen(),
+      admin: (context) => const AuthGuard(requireAdmin: true, child: AdminHomeScreen()),
+      incidents: (context) => const AuthGuard(child: IncidentsScreen()),
+      createIncident: (context) => const AuthGuard(child: CreateIncidentScreen()),
+      notifications: (context) => const AuthGuard(child: NotificationsScreen()),
+    };
+  }
+}
