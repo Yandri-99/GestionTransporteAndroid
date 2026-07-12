@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../screens/public/splash_screen.dart';
+import '../screens/public/onboarding_screen.dart';
+import '../screens/public/welcome_screen.dart';
 import '../screens/public/home_screen.dart';
 import '../screens/public/routes_screen.dart';
 import '../screens/public/route_detail_screen.dart';
@@ -10,6 +13,9 @@ import '../screens/notifications/notifications_screen.dart';
 import '../widgets/auth_guard.dart';
 
 class AppRouter {
+  static const String splash = '/splash';
+  static const String onboarding = '/onboarding';
+  static const String welcome = '/welcome';
   static const String home = '/';
   static const String login = '/login';
   static const String register = '/register';
@@ -22,6 +28,9 @@ class AppRouter {
 
   static Map<String, WidgetBuilder> get routeMap {
     return {
+      splash: (context) => const SplashScreen(),
+      onboarding: (context) => const OnboardingScreen(),
+      welcome: (context) => const WelcomeScreen(),
       home: (context) => const HomeScreen(),
       login: (context) => const LoginScreen(),
       register: (context) => const RegisterScreen(),

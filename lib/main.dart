@@ -5,6 +5,7 @@ import 'presentation/providers/catalog_provider.dart';
 import 'presentation/providers/order_provider.dart';
 import 'presentation/providers/notification_provider.dart';
 import 'presentation/navigation/app_router.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const MoviCoreApp());
@@ -25,11 +26,8 @@ class MoviCoreApp extends StatelessWidget {
       child: MaterialApp(
         title: 'MoviCore',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorSchemeSeed: const Color(0xFF1565C0),
-          useMaterial3: true,
-        ),
-        initialRoute: AppRouter.home,
+        theme: AppTheme.light,
+        initialRoute: AppRouter.splash,
         routes: AppRouter.routeMap,
       ),
     );
