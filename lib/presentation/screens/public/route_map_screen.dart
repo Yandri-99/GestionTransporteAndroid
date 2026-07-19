@@ -51,6 +51,16 @@ class _RouteMapScreenState extends State<RouteMapScreen>
     }
   }
 
+  Color _busColor(String? code) {
+    return switch (code) {
+      'RT-ECO' => AppColors.secondary,
+      'RT-TRO' => AppColors.primary,
+      'RT-ME1' => const Color(0xFF2E7D32),
+      'RT-SUR' => const Color(0xFF880E4F),
+      _ => AppColors.primary,
+    };
+  }
+
   LatLng _interpolateBus(double t) {
     if (_points.isEmpty) return const LatLng(0, 0);
     if (_points.length == 1) return _points.first;
@@ -133,7 +143,7 @@ class _RouteMapScreenState extends State<RouteMapScreen>
               height: 40,
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: _busColor(provider.selectedRoute?.code),
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [

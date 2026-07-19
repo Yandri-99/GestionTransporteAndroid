@@ -89,13 +89,13 @@ class _RoutesScreenState extends State<RoutesScreen> {
           if (index == 0) return _buildSearchField();
 
           final route = filtered[index - 1];
-          final colors = [
-            AppColors.primary,
-            AppColors.secondary,
-            AppColors.tertiary,
-            const Color(0xFFE65100),
-          ];
-          final color = colors[index % colors.length];
+          final color = switch (route.code) {
+            'RT-ECO' => AppColors.secondary,
+            'RT-TRO' => AppColors.primary,
+            'RT-ME1' => const Color(0xFF2E7D32),
+            'RT-SUR' => const Color(0xFF880E4F),
+            _ => AppColors.primary,
+          };
 
           return Card(
             margin: const EdgeInsets.only(bottom: 16),
