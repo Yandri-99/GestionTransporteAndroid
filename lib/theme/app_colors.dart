@@ -11,7 +11,7 @@ class AppColors {
   static const Color error = Color(0xFFD32F2F);
   static const Color warning = Color(0xFFFFA000);
   static const Color success = Color(0xFF2E7D32);
-  static const Color surface = Color(0xFFE3F2FD);
+  static const Color surface = Color(0xFFF0F0F0);
   static const Color surfaceContainer = Color(0xFFFFFFFF);
   static const Color onPrimary = Colors.white;
   static const Color onSecondary = Colors.white;
