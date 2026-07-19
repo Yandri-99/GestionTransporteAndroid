@@ -120,6 +120,8 @@ class HomeScreen extends StatelessWidget {
                       onPressed: () => Navigator.pushNamed(context, '/admin'),
                     ),
                   ],
+                  const SizedBox(height: 16),
+                  const _NewsBanner(),
                 ],
               ),
             ),
@@ -243,6 +245,93 @@ class _LoginPrompt extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _NewsBanner extends StatelessWidget {
+  const _NewsBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary.withAlpha(12), AppColors.secondary.withAlpha(8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withAlpha(20)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.newspaper, color: AppColors.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text('Noticias y Anuncios', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _NewsItem(
+            icon: Icons.info_outline,
+            title: 'Nuevas rutas disponibles',
+            subtitle: 'RT-ECO, RT-TRO, RT-ME1 y RT-SUR ya están operativas',
+          ),
+          const Divider(height: 20),
+          _NewsItem(
+            icon: Icons.phone_in_talk,
+            title: 'Reporta incidentes',
+            subtitle: 'Usa la app para notificar novedades en tu ruta',
+          ),
+          const Divider(height: 20),
+          _NewsItem(
+            icon: Icons.map,
+            title: 'Mapa interactivo',
+            subtitle: 'Sigue tus rutas en tiempo real con el nuevo mapa',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NewsItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  const _NewsItem({required this.icon, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: AppColors.onSurfaceVariant),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              const SizedBox(height: 2),
+              Text(subtitle, style: TextStyle(fontSize: 13, color: AppColors.onSurfaceVariant)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
