@@ -52,40 +52,53 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       return const Center(child: Text('No tienes notificaciones'));
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: provider.notifications.length,
-      itemBuilder: (context, index) {
-        final notif = provider.notifications[index];
-        final icon = switch (notif.type) {
-          'incident' => Icons.report,
-          'warning' => Icons.warning_amber,
-          _ => Icons.notifications,
-        };
-        final iconColor = switch (notif.type) {
-          'incident' => theme.colorScheme.error,
-          'warning' => Colors.orange,
-          _ => theme.colorScheme.primary,
-        };
+    return RefreshIndicator(
+      onRefresh: () => provider.loadNotifications(),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: provider.notifications.length,
+        itemBuilder: (context, index) {
+          final notif = provider.notifications[index];
+          final icon = switch (notif.type) {
+            'incident' => Icons.report,
+            'warning' => Icons.warning_amber,
+            _ => Icons.notifications,
+          };
+          final iconColor = switch (notif.type) {
+            'incident' => theme.colorScheme.error,
+            'warning' => Colors.orange,
+            _ => theme.colorScheme.primary,
+          };
 
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          elevation: notif.isRead ? 0 : 2,
-          child: ListTile(
-            leading: Icon(icon, color: iconColor),
-            title: Text(notif.title,
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            elevation: notif.isRead ? 0 : 2,
+            child: ListTile(
+              leading: Icon(icon, color: iconColor),
+              title: Text(
+                notif.title,
                 style: TextStyle(
-                  fontWeight: notif.isRead ? FontWeight.normal : FontWeight.bold,
-                )),
-            subtitle: Text(notif.message),
-            trailing: notif.isRead ? null : Container(
-              width: 8, height: 8,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                  fontWeight: notif.isRead
+                      ? FontWeight.normal
+                      : FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(notif.message),
+              trailing: notif.isRead
+                  ? null
+                  : Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red,
+                      ),
+                    ),
+              onTap: () => provider.markAsRead(notif.id),
             ),
-            onTap: () => provider.markAsRead(notif.id),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

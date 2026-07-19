@@ -22,6 +22,14 @@ class RouteModel {
       companyName: json['transport_company_name'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'description': description,
+    'transport_company_name': companyName,
+  };
 }
 
 class BusStop {
@@ -51,6 +59,15 @@ class BusStop {
       stopOrder: json['stop_order'] ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'latitude': latitude,
+    'longitude': longitude,
+    'stop_order': stopOrder,
+  };
 }
 
 class RouteCoordinate {
@@ -74,4 +91,11 @@ class RouteCoordinate {
       order: json['order'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'latitude': latitude,
+    'longitude': longitude,
+    'order': order,
+  };
 }

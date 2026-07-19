@@ -31,13 +31,19 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (provider.successMessage != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(provider.successMessage!), backgroundColor: AppColors.success),
+          SnackBar(
+            content: Text(provider.successMessage!),
+            backgroundColor: AppColors.success,
+          ),
         );
         provider.clearMessages();
       }
       if (provider.error != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(provider.error!), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(provider.error!),
+            backgroundColor: AppColors.error,
+          ),
         );
         provider.clearMessages();
       }
@@ -72,38 +78,56 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 80, height: 80,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: AppColors.success.withAlpha(15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.check_circle, size: 44, color: AppColors.success.withAlpha(180)),
+              child: Icon(
+                Icons.check_circle,
+                size: 44,
+                color: AppColors.success.withAlpha(180),
+              ),
             ),
             const SizedBox(height: 16),
-            Text('No hay incidencias', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'No hay incidencias',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
-            Text('Todo está en orden', style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              'Todo está en orden',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ],
         ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-      itemCount: provider.incidents.length,
-      itemBuilder: (context, index) {
-        final incident = provider.incidents[index];
-        return _IncidentCard(
-          incident: incident,
-          isAdmin: isAdmin,
-          onResolve: () => provider.resolveIncident(incident.id),
-          onDelete: () => _confirmDelete(context, provider, incident),
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: () => provider.loadIncidents(),
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        itemCount: provider.incidents.length,
+        itemBuilder: (context, index) {
+          final incident = provider.incidents[index];
+          return _IncidentCard(
+            incident: incident,
+            isAdmin: isAdmin,
+            onResolve: () => provider.resolveIncident(incident.id),
+            onDelete: () => _confirmDelete(context, provider, incident),
+          );
+        },
+      ),
     );
   }
 
-  void _confirmDelete(BuildContext context, OrderProvider provider, Incident incident) {
+  void _confirmDelete(
+    BuildContext context,
+    OrderProvider provider,
+    Incident incident,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -111,10 +135,16 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
         title: const Text('Eliminar incidencia'),
         content: Text('¿Eliminar "${incident.incidentTypeName}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () { Navigator.pop(ctx); provider.deleteIncident(incident.id); },
+            onPressed: () {
+              Navigator.pop(ctx);
+              provider.deleteIncident(incident.id);
+            },
             child: const Text('Eliminar'),
           ),
         ],
@@ -151,7 +181,11 @@ class _IncidentCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isResolved ? AppColors.success.withAlpha(30) : severityColor.withAlpha(30)),
+          border: Border.all(
+            color: isResolved
+                ? AppColors.success.withAlpha(30)
+                : severityColor.withAlpha(30),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -164,9 +198,12 @@ class _IncidentCard extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        width: 40, height: 40,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
-                          color: (isResolved ? AppColors.success : severityColor).withAlpha(20),
+                          color:
+                              (isResolved ? AppColors.success : severityColor)
+                                  .withAlpha(20),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -179,21 +216,40 @@ class _IncidentCard extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(incident.incidentTypeName, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                          Text(
+                            incident.incidentTypeName,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           const SizedBox(height: 2),
-                          Text(incident.createdAt, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12)),
+                          Text(
+                            incident.createdAt,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: severityColor.withAlpha(20),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(incident.severity.toUpperCase(),
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: severityColor)),
+                    child: Text(
+                      incident.severity.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: severityColor,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -206,15 +262,20 @@ class _IncidentCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: (isResolved ? AppColors.success : severityColor).withAlpha(15),
+                      color: (isResolved ? AppColors.success : severityColor)
+                          .withAlpha(15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       isResolved ? 'RESUELTA' : 'ABIERTA',
                       style: TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.w600,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                         color: isResolved ? AppColors.success : severityColor,
                       ),
                     ),
@@ -228,12 +289,16 @@ class _IncidentCard extends StatelessWidget {
                             foregroundColor: AppColors.success,
                           ),
                           onPressed: onResolve,
-                          child: const Text('Resolver', style: TextStyle(fontSize: 13)),
+                          child: const Text(
+                            'Resolver',
+                            style: TextStyle(fontSize: 13),
+                          ),
                         ),
                       if (isAdmin) ...[
                         const SizedBox(width: 8),
                         SizedBox(
-                          width: 36, height: 36,
+                          width: 36,
+                          height: 36,
                           child: IconButton(
                             icon: const Icon(Icons.delete_outline, size: 20),
                             color: AppColors.error,
@@ -314,19 +379,30 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
                     Row(
                       children: [
                         Container(
-                          width: 40, height: 40,
+                          width: 40,
+                          height: 40,
                           decoration: BoxDecoration(
                             color: AppColors.secondary.withAlpha(20),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.report, color: AppColors.secondary, size: 22),
+                          child: const Icon(
+                            Icons.report,
+                            color: AppColors.secondary,
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 12),
-                        Text('Nueva Incidencia', style: theme.textTheme.titleLarge),
+                        Text(
+                          'Nueva Incidencia',
+                          style: theme.textTheme.titleLarge,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text('Reporta una incidencia en la ruta', style: theme.textTheme.bodyMedium),
+                    Text(
+                      'Reporta una incidencia en la ruta',
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ],
                 ),
               ),
@@ -340,7 +416,10 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
               children: _types.entries.map((e) {
                 final selected = _incidentTypeId == e.key;
                 return ChoiceChip(
-                  label: Text(e.value, style: const TextStyle(color: Colors.black87)),
+                  label: Text(
+                    e.value,
+                    style: const TextStyle(color: Colors.black87),
+                  ),
                   selected: selected,
                   selectedColor: AppColors.primary.withAlpha(30),
                   onSelected: (_) => setState(() => _incidentTypeId = e.key),
@@ -355,9 +434,14 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
               children: ['low', 'medium', 'high'].map((s) {
                 final selected = _severity == s;
                 final label = s[0].toUpperCase() + s.substring(1);
-                final color = s == 'high' ? AppColors.error : (s == 'medium' ? AppColors.warning : AppColors.primary);
+                final color = s == 'high'
+                    ? AppColors.error
+                    : (s == 'medium' ? AppColors.warning : AppColors.primary);
                 return ChoiceChip(
-                  label: Text(label, style: const TextStyle(color: Colors.black87)),
+                  label: Text(
+                    label,
+                    style: const TextStyle(color: Colors.black87),
+                  ),
                   selected: selected,
                   selectedColor: color.withAlpha(30),
                   onSelected: (_) => setState(() => _severity = s),
@@ -410,11 +494,22 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
-                onPressed: _descCtrl.text.isNotEmpty && !provider.isLoading ? _submit : null,
+                onPressed: _descCtrl.text.isNotEmpty && !provider.isLoading
+                    ? _submit
+                    : null,
                 icon: provider.isLoading
-                    ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Icon(Icons.send),
-                label: Text(provider.isLoading ? 'Enviando...' : 'Reportar Incidencia'),
+                label: Text(
+                  provider.isLoading ? 'Enviando...' : 'Reportar Incidencia',
+                ),
               ),
             ),
           ],

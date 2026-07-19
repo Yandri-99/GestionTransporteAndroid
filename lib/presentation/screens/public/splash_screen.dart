@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _animCtrl, curve: const Interval(0.4, 1.0, curve: Curves.easeInOut)),
     );
     _animCtrl.forward();
-    _initApp();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initApp());
   }
 
   Future<void> _initApp() async {
