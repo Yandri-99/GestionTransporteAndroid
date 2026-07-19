@@ -120,7 +120,10 @@ class _SplashScreenState extends State<SplashScreen>
                         color: Colors.white.withAlpha(30),
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      child: const Icon(Icons.directions_bus, size: 56, color: Colors.white),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Image.asset('assets/images/logo.jpeg', width: 100, height: 100, fit: BoxFit.cover),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     const Text('MoviCore', style: TextStyle(

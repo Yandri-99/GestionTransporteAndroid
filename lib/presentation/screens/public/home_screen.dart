@@ -44,7 +44,10 @@ class HomeScreen extends StatelessWidget {
                                     color: Colors.white.withAlpha(30),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(Icons.directions_bus, color: Colors.white, size: 24),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset('assets/images/logo.jpeg', width: 40, height: 40, fit: BoxFit.cover),
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 const Text('MoviCore',
