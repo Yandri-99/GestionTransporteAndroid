@@ -235,6 +235,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: Card(
+                        color: routeColor.withAlpha(8),
                         margin: const EdgeInsets.only(bottom: 4),
                         child: Padding(
                           padding: const EdgeInsets.all(14),
@@ -299,6 +300,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
             const SizedBox(height: 12),
             ...provider.coordinates.map(
               (c) => Card(
+                color: routeColor.withAlpha(8),
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
                 child: ListTile(
                   dense: true,
