@@ -44,10 +44,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<CatalogProvider>();
     final theme = Theme.of(context);
+    final Color routeColor = _routeColor(provider.selectedRoute?.code);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(provider.selectedRoute?.name ?? 'Detalle Ruta'),
+        backgroundColor: routeColor,
+        foregroundColor: Colors.white,
       ),
       body: _buildBody(provider, theme),
     );
