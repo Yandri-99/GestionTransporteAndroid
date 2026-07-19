@@ -114,16 +114,11 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 100, height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: Image.asset('assets/images/logo.jpeg', width: 100, height: 100, fit: BoxFit.cover),
-                      ),
+                    Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset('assets/images/logo.jpeg', width: 100, height: 100, fit: BoxFit.fill),
                     ),
                     const SizedBox(height: 24),
                     const Text('MoviCore', style: TextStyle(

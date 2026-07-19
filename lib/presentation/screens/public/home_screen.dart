@@ -38,16 +38,11 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Container(
-                                  width: 40, height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset('assets/images/logo.jpeg', width: 40, height: 40, fit: BoxFit.cover),
-                                  ),
+                                Material(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: Image.asset('assets/images/logo.jpeg', width: 40, height: 40, fit: BoxFit.fill),
                                 ),
                                 const SizedBox(width: 12),
                                 const Text('MoviCore',
