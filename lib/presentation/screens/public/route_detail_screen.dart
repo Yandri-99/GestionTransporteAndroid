@@ -69,6 +69,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
           Card(
+            color: routeColor.withAlpha(8),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
