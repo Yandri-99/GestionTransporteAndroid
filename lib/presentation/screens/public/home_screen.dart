@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [AppColors.headerGradientStart, AppColors.headerGradientEnd],
+                    colors: [AppColors.primary, AppColors.secondary],
                   ),
                 ),
                 child: SafeArea(
@@ -73,16 +73,7 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text('Inteligente', style: TextStyle(fontSize: isSmall ? 16 : 20, color: Colors.white70)),
                         const SizedBox(height: 8),
-                        Row(
-                          children: List.generate(3, (i) => Container(
-                            width: i == 0 ? 24 : 8, height: 8,
-                            margin: const EdgeInsets.only(right: 4),
-                            decoration: BoxDecoration(
-                              color: i == 0 ? AppColors.secondary : Colors.white38,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          )),
-                        ),
+                        const _RotatingMessage(),
                       ],
                     ),
                   ),
@@ -251,6 +242,67 @@ class _LoginPrompt extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RotatingMessage extends StatefulWidget {
+  const _RotatingMessage();
+
+  @override
+  State<_RotatingMessage> createState() => _RotatingMessageState();
+}
+
+class _RotatingMessageState extends State<_RotatingMessage>
+    with SingleTickerProviderStateMixin {
+  final List<String> _messages = [
+    'Rutas actualizadas al instante',
+    'Movilidad inteligente para Quito',
+    'Tu transporte, tu ciudad',
+    'Conectando Quito',
+  ];
+  late AnimationController _animCtrl;
+  late Animation<double> _fadeIn;
+  int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeIn = CurvedAnimation(parent: _animCtrl, curve: Curves.easeInOut);
+    _animCtrl.forward();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    Future.delayed(const Duration(seconds: 4), () {
+      if (!mounted) return;
+      _animCtrl.reverse().then((_) {
+        if (!mounted) return;
+        setState(() => _index = (_index + 1) % _messages.length);
+        _animCtrl.forward();
+      });
+      _startTimer();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeIn,
+      child: Text(
+        _messages[_index],
+        style: const TextStyle(fontSize: 13, color: Colors.white70),
       ),
     );
   }
