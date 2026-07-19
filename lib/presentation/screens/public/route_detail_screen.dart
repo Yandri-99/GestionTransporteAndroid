@@ -16,6 +16,16 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   int? _routeId;
   bool _loaded = false;
 
+  Color _routeColor(String? code) {
+    return switch (code) {
+      'RT-ECO' => AppColors.secondary,
+      'RT-TRO' => AppColors.primary,
+      'RT-ME1' => const Color(0xFF2E7D32),
+      'RT-SUR' => const Color(0xFF880E4F),
+      _ => AppColors.primary,
+    };
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -51,6 +61,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
     final route = provider.selectedRoute;
     if (route == null) return const Center(child: Text('Ruta no encontrada'));
+    final Color routeColor = _routeColor(route.code);
 
     return RefreshIndicator(
       onRefresh: () => provider.loadRouteDetail(_routeId!),
@@ -69,12 +80,12 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withAlpha(20),
+                          color: routeColor.withAlpha(20),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           Icons.route,
-                          color: AppColors.primary,
+                          color: routeColor,
                           size: 24,
                         ),
                       ),
@@ -94,7 +105,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withAlpha(20),
+                                color: routeColor.withAlpha(20),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -102,7 +113,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.primary,
+                                  color: routeColor,
                                 ),
                               ),
                             ),
@@ -154,7 +165,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                 children: [
                   Icon(
                     Icons.directions_bus,
-                    color: AppColors.primary,
+                    color: routeColor,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -166,7 +177,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withAlpha(20),
+                      color: routeColor.withAlpha(20),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -174,7 +185,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: routeColor,
                       ),
                     ),
                   ),
@@ -195,7 +206,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: AppColors.primary,
+                            color: routeColor,
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -213,7 +224,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           Container(
                             width: 2,
                             height: 40,
-                            color: AppColors.primary.withAlpha(40),
+                            color: routeColor.withAlpha(40),
                           ),
                       ],
                     ),
@@ -256,7 +267,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 children: [
-                  Icon(Icons.map, color: AppColors.secondary, size: 20),
+                  Icon(Icons.map, color: routeColor, size: 20),
                   const SizedBox(width: 8),
                   Text('Recorrido', style: theme.textTheme.titleLarge),
                   const SizedBox(width: 8),
@@ -266,7 +277,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withAlpha(20),
+                      color: routeColor.withAlpha(20),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -274,7 +285,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.secondary,
+                        color: routeColor,
                       ),
                     ),
                   ),
@@ -289,7 +300,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                   dense: true,
                   leading: Icon(
                     Icons.location_on,
-                    color: AppColors.secondary,
+                    color: routeColor,
                     size: 20,
                   ),
                   title: Text(
