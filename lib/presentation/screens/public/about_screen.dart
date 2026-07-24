@@ -76,11 +76,11 @@ class AboutScreen extends StatelessWidget {
               isDark: isDark,
               child: Column(
                 children: [
-                  _TeamMember(name: 'Yandri Llumiquinga', role: 'Desarrollador', icon: Icons.code),
+                  _TeamMember(name: 'Yandri Llumiquinga', role: 'Desarrollador Mobile', icon: Icons.phone_android),
                   const Divider(height: 20),
-                  _TeamMember(name: 'Edison Tanqueño', role: 'Desarrollador', icon: Icons.code),
+                  _TeamMember(name: 'Edison Tanqueño', role: 'Desarrollador Backend', icon: Icons.storage),
                   const Divider(height: 20),
-                  _TeamMember(name: 'Alexander Calo', role: 'Desarrollador', icon: Icons.code),
+                  _TeamMember(name: 'Alexander Calo', role: 'Desarrollador Frontend', icon: Icons.web),
                 ],
               ),
             ),
