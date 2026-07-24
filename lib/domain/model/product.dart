@@ -24,7 +24,7 @@ class RouteModel {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    if (id > 0) 'id': id,
     'code': code,
     'name': name,
     'description': description,
@@ -61,7 +61,7 @@ class BusStop {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    if (id > 0) 'id': id,
     'code': code,
     'name': name,
     'latitude': latitude,
@@ -98,4 +98,59 @@ class RouteCoordinate {
     'longitude': longitude,
     'order': order,
   };
+}
+
+class Vehicle {
+  final int id;
+  final String plate;
+  final String brand;
+  final String model;
+  final int capacity;
+
+  Vehicle({
+    required this.id,
+    required this.plate,
+    this.brand = '',
+    this.model = '',
+    this.capacity = 0,
+  });
+
+  factory Vehicle.fromJson(Map<String, dynamic> json) {
+    return Vehicle(
+      id: json['id'],
+      plate: json['plate'] ?? '',
+      brand: json['brand'] ?? '',
+      model: json['model'] ?? '',
+      capacity: json['capacity'] ?? 0,
+    );
+  }
+}
+
+class Trip {
+  final int id;
+  final String routeName;
+  final String vehiclePlate;
+  final String driverName;
+  final String status;
+  final String date;
+
+  Trip({
+    required this.id,
+    this.routeName = '',
+    this.vehiclePlate = '',
+    this.driverName = '',
+    this.status = '',
+    this.date = '',
+  });
+
+  factory Trip.fromJson(Map<String, dynamic> json) {
+    return Trip(
+      id: json['id'],
+      routeName: json['route_name'] ?? json['route']?.toString() ?? '',
+      vehiclePlate: json['vehicle_plate'] ?? json['vehicle']?.toString() ?? '',
+      driverName: json['driver_name'] ?? json['driver']?.toString() ?? '',
+      status: json['status'] ?? '',
+      date: json['date'] ?? '',
+    );
+  }
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_message.dart';
+import '../../../theme/app_colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -29,14 +30,41 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       appBar: AppBar(
         title: const Text('Notificaciones'),
         actions: [
-          if (provider.unreadCount > 0)
+          if (provider.notifications.isNotEmpty) ...[
+            if (provider.unreadCount > 0)
+              TextButton(
+                onPressed: () => provider.markAllAsRead(),
+                child: const Text('Leer todas'),
+              ),
             TextButton(
-              onPressed: () => provider.markAllAsRead(),
-              child: const Text('Leer todas'),
+              onPressed: () => _confirmDeleteAll(context, provider),
+              child: const Text('Borrar todas', style: TextStyle(color: AppColors.error)),
             ),
+          ],
         ],
       ),
       body: _buildBody(provider, theme),
+    );
+  }
+
+  void _confirmDeleteAll(BuildContext context, NotificationProvider provider) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Borrar todas'),
+        content: const Text('¿Eliminar todas las notificaciones?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () {
+              Navigator.pop(ctx);
+              provider.deleteAllNotifications();
+            },
+            child: const Text('Borrar'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -78,22 +106,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               title: Text(
                 notif.title,
                 style: TextStyle(
-                  fontWeight: notif.isRead
-                      ? FontWeight.normal
-                      : FontWeight.bold,
+                  fontWeight: notif.isRead ? FontWeight.normal : FontWeight.bold,
                 ),
               ),
               subtitle: Text(notif.message),
-              trailing: notif.isRead
-                  ? null
-                  : Container(
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!notif.isRead)
+                    Container(
                       width: 8,
                       height: 8,
+                      margin: const EdgeInsets.only(right: 4),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.red,
                       ),
                     ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, size: 20),
+                    color: AppColors.error,
+                    onPressed: () => provider.deleteNotification(notif.id),
+                  ),
+                ],
+              ),
               onTap: () => provider.markAsRead(notif.id),
             ),
           );

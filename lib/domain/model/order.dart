@@ -1,6 +1,8 @@
 class Incident {
   final int id;
-  final int tripId;
+  final int? tripId;
+  final int? vehicleId;
+  final int? driverId;
   final int incidentTypeId;
   final String incidentTypeName;
   final String description;
@@ -12,7 +14,9 @@ class Incident {
 
   Incident({
     required this.id,
-    this.tripId = 1,
+    this.tripId,
+    this.vehicleId,
+    this.driverId,
     this.incidentTypeId = 1,
     this.incidentTypeName = '',
     this.description = '',
@@ -26,9 +30,11 @@ class Incident {
   factory Incident.fromJson(Map<String, dynamic> json) {
     return Incident(
       id: json['id'],
-      tripId: json['trip'] ?? 1,
-      incidentTypeId: json['incident_type'] ?? 1,
-      incidentTypeName: json['incident_type_name'] ?? '',
+      tripId: _parseId(json['trip']),
+      vehicleId: _parseId(json['vehicle']),
+      driverId: _parseId(json['driver']),
+      incidentTypeId: _parseId(json['incident_type']) ?? 1,
+      incidentTypeName: json['incident_type_name'] ?? (json['incident_type'] is Map ? json['incident_type']['name'] ?? '' : ''),
       description: json['description'] ?? '',
       severity: json['severity'] ?? 'medium',
       status: json['status'] ?? 'open',
@@ -38,8 +44,17 @@ class Incident {
     );
   }
 
+  static int? _parseId(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is Map && value.containsKey('id')) return value['id'] as int?;
+    return int.tryParse(value.toString());
+  }
+
   Map<String, dynamic> toJson() => {
-    'trip': tripId > 0 ? tripId : 1,
+    if (tripId != null) 'trip': tripId,
+    if (vehicleId != null) 'vehicle': vehicleId,
+    if (driverId != null) 'driver': driverId,
     'incident_type': incidentTypeId,
     'latitude': latitude.toString(),
     'longitude': longitude.toString(),

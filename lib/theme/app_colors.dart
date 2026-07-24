@@ -21,4 +21,11 @@ class AppColors {
   static const Color headerGradientStart = Color(0xFF0D47A1);
   static const Color headerGradientEnd = Color(0xFF1565C0);
   static const Color cardShadow = Color(0x1A000000);
+
+  static const Color darkSurface = Color(0xFF121212);
+  static const Color darkSurfaceContainer = Color(0xFF1E1E1E);
+  static const Color darkOnSurface = Color(0xFFE0E0E0);
+  static const Color darkOnSurfaceVariant = Color(0xFFB0B0B0);
+  static const Color darkOutline = Color(0xFF555555);
+  static const Color darkCardShadow = Color(0x40000000);
 }

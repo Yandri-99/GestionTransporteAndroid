@@ -30,3 +30,32 @@ class LoginResponseDto {
     );
   }
 }
+
+class PasswordResetRequestDto {
+  final String email;
+
+  PasswordResetRequestDto({required this.email});
+
+  Map<String, dynamic> toJson() => {'email': email};
+}
+
+class PasswordResetConfirmDto {
+  final String uid;
+  final String token;
+  final String newPassword;
+  final String newPassword2;
+
+  PasswordResetConfirmDto({
+    required this.uid,
+    required this.token,
+    required this.newPassword,
+    required this.newPassword2,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'uid': uid,
+        'token': token,
+        'new_password': newPassword,
+        'new_password2': newPassword2,
+      };
+}

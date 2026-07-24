@@ -6,4 +6,6 @@ abstract class AuthRepository {
   Future<User> getMe();
   Future<void> logout();
   Future<bool> isLoggedIn();
+  Future<void> requestPasswordReset(String email);
+  Future<void> confirmPasswordReset(String uid, String token, String newPassword, String newPassword2);
 }

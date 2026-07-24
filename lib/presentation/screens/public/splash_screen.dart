@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/auth_provider.dart';
 import '../../../theme/app_colors.dart';
+import '../../../core/services/push_notification_service.dart';
+import '../../../main.dart' show navigatorKey;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,16 +25,16 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _animCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1000),
     );
     _fadeIn = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animCtrl, curve: const Interval(0, 0.5, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _animCtrl, curve: const Interval(0, 0.6, curve: Curves.easeOut)),
     );
     _slideUp = Tween<double>(begin: 30, end: 0).animate(
-      CurvedAnimation(parent: _animCtrl, curve: const Interval(0.2, 0.6, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _animCtrl, curve: const Interval(0.1, 0.7, curve: Curves.easeOut)),
     );
     _progress = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animCtrl, curve: const Interval(0.4, 1.0, curve: Curves.easeInOut)),
+      CurvedAnimation(parent: _animCtrl, curve: const Interval(0.3, 1.0, curve: Curves.easeInOut)),
     );
     _animCtrl.forward();
     WidgetsBinding.instance.addPostFrameCallback((_) => _initApp());
@@ -42,7 +44,9 @@ class _SplashScreenState extends State<SplashScreen>
     final auth = context.read<AuthProvider>();
     await auth.checkSession();
     if (!mounted) return;
-    await Future.delayed(const Duration(milliseconds: 1500));
+    PushNotificationService().setNavigatorKey(navigatorKey);
+    PushNotificationService().initialize();
+    await Future.delayed(const Duration(milliseconds: 300));
     if (!mounted) return;
     final prefs = await SharedPreferences.getInstance();
     final showOnboarding = prefs.getBool('show_onboarding') ?? true;
@@ -114,11 +118,9 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Material(
-                      color: Colors.white,
+                    ClipRRect(
                       borderRadius: BorderRadius.circular(25),
-                      clipBehavior: Clip.antiAlias,
-                      child: Image.asset('assets/images/logo.jpeg', width: 100, height: 100, fit: BoxFit.fill),
+                      child: Image.asset('assets/images/logo.png', width: 280, height: 280, fit: BoxFit.contain),
                     ),
                     const SizedBox(height: 24),
                     const Text('MoviCore', style: TextStyle(

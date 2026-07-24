@@ -24,7 +24,8 @@ class OrderRepositoryImpl implements OrderRepository {
       final response = await _api.get('/api/incidents/incidents/', params: params);
       final dtos = _extractResults(response.data, IncidentDto.fromJson);
       return dtos.map((d) => Incident(
-        id: d.id, tripId: d.tripId, incidentTypeId: d.incidentTypeId,
+        id: d.id, tripId: d.tripId, vehicleId: d.vehicleId, driverId: d.driverId,
+        incidentTypeId: d.incidentTypeId,
         incidentTypeName: d.incidentTypeName, description: d.description,
         severity: d.severity, status: d.status,
         latitude: d.latitude, longitude: d.longitude,
@@ -39,7 +40,9 @@ class OrderRepositoryImpl implements OrderRepository {
   Future<void> createIncident(Incident incident) async {
     try {
       final dto = IncidentDto(
-        id: 0, tripId: incident.tripId, incidentTypeId: incident.incidentTypeId,
+        id: 0, tripId: incident.tripId,
+        vehicleId: incident.vehicleId, driverId: incident.driverId,
+        incidentTypeId: incident.incidentTypeId,
         description: incident.description, severity: incident.severity,
         latitude: incident.latitude, longitude: incident.longitude,
       );
@@ -69,7 +72,24 @@ class OrderRepositoryImpl implements OrderRepository {
 
   String _parseError(dynamic data) {
     if (data == null) return 'Error de conexión';
-    if (data is Map && data.containsKey('message')) return data['message'];
-    return 'Error desconocido';
+    if (data is String) return data.isNotEmpty ? data : 'Respuesta vacía';
+    if (data is Map) {
+      if (data.containsKey('errors') && data['errors'] is Map) {
+        final errors = data['errors'] as Map;
+        final messages = <String>[];
+        errors.forEach((key, value) {
+          if (value is List) {
+            messages.addAll(value.map((e) => '$key: $e'));
+          } else {
+            messages.add('$key: $value');
+          }
+        });
+        return messages.isNotEmpty ? messages.join('\n') : data.toString();
+      }
+      if (data.containsKey('detail')) return data['detail'].toString();
+      if (data.containsKey('message')) return data['message'];
+      return data.toString();
+    }
+    return data.toString();
   }
 }

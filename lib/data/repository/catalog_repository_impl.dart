@@ -149,4 +149,89 @@ class CatalogRepositoryImpl implements CatalogRepository {
       );
     }
   }
+
+  String _parseError(dynamic data) {
+    if (data == null) return 'Error de conexión';
+    if (data is Map && data.containsKey('detail')) return data['detail'].toString();
+    if (data is Map && data.containsKey('message')) return data['message'];
+    return 'Error desconocido';
+  }
+
+  @override
+  Future<void> createRoute(RouteModel route) async {
+    try {
+      await _api.post('/api/transport/routes/', data: route.toJson());
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> updateRoute(RouteModel route) async {
+    try {
+      await _api.put('/api/transport/routes/${route.id}/', data: route.toJson());
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> deleteRoute(int id) async {
+    try {
+      await _api.delete('/api/transport/routes/$id/');
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> createStop(BusStop stop) async {
+    try {
+      await _api.post('/api/transport/bus-stops/', data: stop.toJson());
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> updateStop(BusStop stop) async {
+    try {
+      await _api.put('/api/transport/bus-stops/${stop.id}/', data: stop.toJson());
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> deleteStop(int id) async {
+    try {
+      await _api.delete('/api/transport/bus-stops/$id/');
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<List<Vehicle>> getVehicles() async {
+    try {
+      final response = await _api.get('/api/transport/vehicles/');
+      final data = response.data;
+      final items = data is Map ? (data['results'] ?? data['value'] ?? data as List) : data as List;
+      return (items as List).map((e) => Vehicle.fromJson(e as Map<String, dynamic>)).toList();
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<List<Trip>> getTrips() async {
+    try {
+      final response = await _api.get('/api/operations/trips/');
+      final data = response.data;
+      final items = data is Map ? (data['results'] ?? data['value'] ?? data as List) : data as List;
+      return (items as List).map((e) => Trip.fromJson(e as Map<String, dynamic>)).toList();
+    } on DioException catch (e) {
+      throw ApiException('Error al cargar viajes: ${e.message}', statusCode: e.response?.statusCode);
+    }
+  }
 }

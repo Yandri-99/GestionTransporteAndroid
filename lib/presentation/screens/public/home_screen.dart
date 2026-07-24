@@ -1,14 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../providers/order_provider.dart';
+import '../../providers/notification_provider.dart';
 import '../../../theme/app_colors.dart';
+import '../../navigation/app_transitions.dart';
+import '../public/routes_screen.dart';
+import '../public/welcome_screen.dart';
+import '../public/about_screen.dart';
+import '../admin/incidents_screen.dart';
+import '../admin/admin_home_screen.dart';
+import '../auth/login_screen.dart';
+import '../notifications/notifications_screen.dart';
+import '../../widgets/auth_guard.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _loaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_loaded) {
+      _loaded = true;
+      final auth = context.read<AuthProvider>();
+      if (auth.isLoggedIn) {
+        context.read<OrderProvider>().loadIncidents();
+        context.read<NotificationProvider>().loadNotifications();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final themeProv = context.watch<ThemeProvider>();
+    final notifProv = context.watch<NotificationProvider>();
     final size = MediaQuery.of(context).size;
     final isSmall = size.width < 360;
 
@@ -36,25 +70,42 @@ class HomeScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            const Text('MoviCore',
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                             Row(
                               children: [
-                                Material(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Image.asset('assets/images/logo.jpeg', width: 40, height: 40, fit: BoxFit.fill),
+                                IconButton(
+                                  icon: Icon(
+                                    themeProv.isDark ? Icons.light_mode : Icons.dark_mode,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () => themeProv.toggleTheme(),
                                 ),
-                                const SizedBox(width: 12),
-                                const Text('MoviCore',
-                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                              ],
-                            ),
-                            Row(
-                              children: [
                                 if (auth.isLoggedIn)
-                                  IconButton(
-                                    icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-                                    onPressed: () => Navigator.pushNamed(context, '/notifications'),
+                                  Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                                        onPressed: () => Navigator.push(context, AppTransitions.fadeSlide(const NotificationsScreen())),
+                                      ),
+                                      if (notifProv.unreadCount > 0)
+                                        Positioned(
+                                          right: 6,
+                                          top: 6,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: const BoxDecoration(
+                                              color: AppColors.error,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Text(
+                                              '${notifProv.unreadCount}',
+                                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 if (auth.isLoggedIn)
                                   IconButton(
@@ -91,21 +142,21 @@ class HomeScreen extends StatelessWidget {
                     subtitle: 'Descubre todas las rutas de transporte público disponibles en la ciudad.',
                     buttonLabel: 'Ver Rutas Disponibles',
                     buttonType: 'primary',
-                    onPressed: () => Navigator.pushNamed(context, '/routes'),
+                    onPressed: () => Navigator.push(context, AppTransitions.fadeSlide(const RoutesScreen())),
                   ),
                   const SizedBox(height: 16),
                   if (auth.isLoggedIn)
                     _FeatureCard(
-                      icon: Icons.report_outlined,
+                      icon: Icons.map_outlined,
                       iconColor: AppColors.secondary,
-                      title: 'Reportar Incidencia',
-                      subtitle: 'Ayuda a mejorar el servicio reportando incidencias en las rutas.',
-                      buttonLabel: 'Reportar Incidencia',
+                      title: 'Estado de las Rutas',
+                      subtitle: 'Conoce las incidencias activas y el estado operativo del transporte en tiempo real.',
+                      buttonLabel: 'Ver Incidencias',
                       buttonType: 'outlined',
-                      onPressed: () => Navigator.pushNamed(context, '/incidents'),
+                      onPressed: () => Navigator.push(context, AppTransitions.fadeSlide(const IncidentsScreen())),
                     ),
                   if (!auth.isLoggedIn)
-                    _LoginPrompt(onPressed: () => Navigator.pushNamed(context, '/login')),
+                    _LoginPrompt(onPressed: () => Navigator.push(context, AppTransitions.fadeSlide(const LoginScreen()))),
                   if (auth.isAdmin) ...[
                     const SizedBox(height: 16),
                     _FeatureCard(
@@ -115,11 +166,20 @@ class HomeScreen extends StatelessWidget {
                       subtitle: 'Gestiona usuarios, incidencias y monitorea el sistema.',
                       buttonLabel: 'Ir al Panel Admin',
                       buttonType: 'tonal',
-                      onPressed: () => Navigator.pushNamed(context, '/admin'),
+                      onPressed: () => Navigator.push(context, AppTransitions.fadeSlide(const AuthGuard(requireAdmin: true, child: AdminHomeScreen()))),
                     ),
                   ],
                   const SizedBox(height: 16),
                   const _NewsBanner(),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.push(context, AppTransitions.fadeSlide(const AboutScreen())),
+                      icon: const Icon(Icons.info_outline),
+                      label: const Text('Acerca de MoviCore'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -144,7 +204,9 @@ class HomeScreen extends StatelessWidget {
     if (confirm == true && context.mounted) {
       final auth = context.read<AuthProvider>();
       await auth.logout();
-      if (context.mounted) Navigator.pushReplacementNamed(context, '/welcome');
+      if (context.mounted) {
+        Navigator.pushReplacement(context, AppTransitions.fadeSlide(const WelcomeScreen()));
+      }
     }
   }
 }
@@ -230,7 +292,7 @@ class _LoginPrompt extends StatelessWidget {
         children: [
           Icon(Icons.person_outline, size: 48, color: AppColors.onSurfaceVariant),
           const SizedBox(height: 12),
-          Text('Inicia sesión para reportar incidencias',
+          Text('Inicia sesión para ver el estado de las rutas',
               style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
           const SizedBox(height: 16),
           SizedBox(
@@ -290,9 +352,9 @@ class _NewsBanner extends StatelessWidget {
           ),
           const Divider(height: 20),
           _NewsItem(
-            icon: Icons.phone_in_talk,
-            title: 'Reporta incidentes',
-            subtitle: 'Usa la app para notificar novedades en tu ruta',
+            icon: Icons.map,
+            title: 'Estado de las Rutas',
+            subtitle: 'Consulta incidencias activas y estado operativo en tiempo real',
           ),
           const Divider(height: 20),
           _NewsItem(

@@ -69,4 +69,28 @@ class NotificationProvider extends ChangeNotifier {
     await _api.put('/api/notifications/notifications/read_all/');
     await loadNotifications();
   }
+
+  Future<void> deleteNotification(int id) async {
+    try {
+      await _api.delete('/api/notifications/notifications/$id/');
+      _notifications.removeWhere((n) => n.id == id);
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteAllNotifications() async {
+    try {
+      for (final n in List.from(_notifications)) {
+        await _api.delete('/api/notifications/notifications/${n.id}/');
+      }
+      _notifications.clear();
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+    }
+  }
 }

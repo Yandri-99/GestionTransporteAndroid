@@ -30,7 +30,7 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createIncident(Incident incident) async {
+  Future<bool> createIncident(Incident incident) async {
     _isLoading = true;
     _error = null;
     _successMessage = null;
@@ -40,10 +40,12 @@ class OrderProvider extends ChangeNotifier {
       await _repo.createIncident(incident);
       _successMessage = 'Incidencia reportada exitosamente';
       await loadIncidents();
+      return true;
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
       _isLoading = false;
       notifyListeners();
+      return false;
     }
   }
 

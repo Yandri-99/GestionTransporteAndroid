@@ -163,6 +163,48 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               ],
             ),
             const SizedBox(height: 24),
+            Text('Gestión', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/admin_routes'),
+                icon: const Icon(Icons.route),
+                label: const Text('Gestionar Rutas'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/admin_stops'),
+                icon: const Icon(Icons.location_on_outlined),
+                label: const Text('Gestionar Paradas'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/admin_drivers'),
+                icon: const Icon(Icons.person),
+                label: const Text('Gestionar Conductores'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/admin_assignments'),
+                icon: const Icon(Icons.link),
+                label: const Text('Asignar Rutas a Conductores'),
+              ),
+            ),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               height: 56,

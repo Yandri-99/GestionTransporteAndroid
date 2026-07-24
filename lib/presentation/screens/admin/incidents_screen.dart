@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/catalog_provider.dart';
+import '../../providers/driver_provider.dart';
 import '../../../domain/model/order.dart';
 import '../../widgets/loading_indicator.dart';
 import '../../widgets/error_message.dart';
 import '../../../theme/app_colors.dart';
+import '../../../core/services/analytics_service.dart';
 
 class IncidentsScreen extends StatefulWidget {
   const IncidentsScreen({super.key});
@@ -175,6 +178,8 @@ class _IncidentCard extends StatelessWidget {
       _ => AppColors.primary,
     };
     final isResolved = incident.status == 'resolved';
+    final isOperational = incident.severity == 'low';
+    final estimatedDelay = _estimatedDelay(incident.severity);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -259,6 +264,24 @@ class _IncidentCard extends StatelessWidget {
               ],
               const SizedBox(height: 12),
               Row(
+                children: [
+                  _StatusChip(
+                    icon: Icons.schedule,
+                    label: 'Demora est.',
+                    value: estimatedDelay,
+                    color: AppColors.warning,
+                  ),
+                  const SizedBox(width: 8),
+                  _StatusChip(
+                    icon: isOperational ? Icons.check_circle : Icons.cancel,
+                    label: 'Estado',
+                    value: isOperational ? 'Operativo' : 'No operativo',
+                    color: isOperational ? AppColors.success : AppColors.error,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
@@ -282,6 +305,18 @@ class _IncidentCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/incident_map',
+                            arguments: incident.id,
+                          );
+                        },
+                        icon: Icon(Icons.map, size: 16, color: AppColors.primary),
+                        label: Text('Ver en mapa', style: TextStyle(fontSize: 12, color: AppColors.primary)),
+                      ),
+                      const SizedBox(width: 4),
                       if (!isResolved && isAdmin)
                         FilledButton.tonal(
                           style: FilledButton.styleFrom(
@@ -317,6 +352,59 @@ class _IncidentCard extends StatelessWidget {
       ),
     );
   }
+
+  String _estimatedDelay(String severity) {
+    switch (severity) {
+      case 'high': return '~60 min';
+      case 'medium': return '~30 min';
+      case 'low': return '~15 min';
+      default: return '~30 min';
+    }
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatusChip({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withAlpha(15),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[600])),
+                  Text(value, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class CreateIncidentScreen extends StatefulWidget {
@@ -334,6 +422,22 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
   int _incidentTypeId = 1;
   final _types = {1: 'Accidente', 2: 'Falla Mecánica', 3: 'Retraso'};
 
+  int? _selectedTripId;
+  int? _selectedVehicleId;
+  int? _selectedDriverId;
+
+  @override
+  void initState() {
+    super.initState();
+    _descCtrl.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CatalogProvider>().loadTrips();
+      context.read<CatalogProvider>().loadVehicles();
+      context.read<CatalogProvider>().loadRoutes();
+      context.read<DriverProvider>().loadDrivers();
+    });
+  }
+
   @override
   void dispose() {
     _descCtrl.dispose();
@@ -345,7 +449,9 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
   void _submit() {
     final incident = Incident(
       id: 0,
-      tripId: 1,
+      tripId: _selectedTripId,
+      vehicleId: _selectedVehicleId,
+      driverId: _selectedDriverId,
       incidentTypeId: _incidentTypeId,
       description: _descCtrl.text.trim(),
       severity: _severity,
@@ -353,14 +459,52 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
       longitude: double.tryParse(_lngCtrl.text) ?? 0,
     );
     if (!mounted) return;
-    context.read<OrderProvider>().createIncident(incident).then((_) {
-      if (mounted) Navigator.pop(context);
+    context.read<OrderProvider>().createIncident(incident).then((success) {
+      if (mounted) {
+        if (success) {
+          AnalyticsService().logIncidentCreated(
+            _types[_incidentTypeId] ?? 'Unknown',
+            _severity,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.notifications_active, color: Colors.white, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Nueva incidencia: ${_types[_incidentTypeId] ?? "Reporte"} — ${_severity.toUpperCase()}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          final error = context.read<OrderProvider>().error;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error ?? 'Error al crear incidencia'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<OrderProvider>();
+    final catalog = context.watch<CatalogProvider>();
+    final driverProv = context.watch<DriverProvider>();
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -408,6 +552,28 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            Text('Viaje', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<int>(
+              initialValue: _selectedTripId,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Seleccionar viaje',
+              ),
+              items: catalog.trips.map((t) {
+                final routeName = catalog.routes
+                    .where((r) => r.id.toString() == t.routeName || r.code == t.routeName)
+                    .map((r) => r.code)
+                    .firstOrNull;
+                final display = routeName ?? 'Ruta ${t.routeName}';
+                return DropdownMenuItem(
+                  value: t.id,
+                  child: Text('Viaje #${t.id} — $display', overflow: TextOverflow.ellipsis),
+                );
+              }).toList(),
+              onChanged: (v) => setState(() => _selectedTripId = v),
+            ),
+            const SizedBox(height: 20),
             Text('Tipo de Incidencia', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
             Wrap(
@@ -427,7 +593,41 @@ class _CreateIncidentScreenState extends State<CreateIncidentScreen> {
               }).toList(),
             ),
             const SizedBox(height: 20),
-            Text('Tipo de gravedad', style: theme.textTheme.titleMedium),
+            Text('Vehículo', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<int>(
+              initialValue: _selectedVehicleId,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Seleccionar vehículo (opcional)',
+              ),
+              items: catalog.vehicles
+                  .map((v) => DropdownMenuItem(
+                        value: v.id,
+                        child: Text('${v.plate} - ${v.brand} ${v.model}', overflow: TextOverflow.ellipsis),
+                      ))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedVehicleId = v),
+            ),
+            const SizedBox(height: 20),
+            Text('Conductor', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<int>(
+              initialValue: _selectedDriverId,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Seleccionar conductor (opcional)',
+              ),
+              items: driverProv.drivers
+                  .map((d) => DropdownMenuItem(
+                        value: d.id,
+                        child: Text('${d.licenseNumber} - ${d.licenseType}', overflow: TextOverflow.ellipsis),
+                      ))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedDriverId = v),
+            ),
+            const SizedBox(height: 20),
+            Text('Gravedad', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,

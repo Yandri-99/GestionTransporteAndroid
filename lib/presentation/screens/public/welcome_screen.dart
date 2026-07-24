@@ -55,7 +55,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   color: Colors.white.withAlpha(25),
                   borderRadius: BorderRadius.circular(22),
                 ),
-                child: const Icon(Icons.directions_bus, size: 50, color: Colors.white),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(22),
+                  child: Image.asset('assets/images/logo.png', width: 90, height: 90, fit: BoxFit.contain),
+                ),
               ),
               const SizedBox(height: 20),
               const Text('MoviCore', style: TextStyle(

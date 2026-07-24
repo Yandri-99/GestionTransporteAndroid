@@ -46,3 +46,6 @@ app.*.map.json
 
 # Backend (separate repo reference)
 /backend/
+
+# Firebase
+google-services.json

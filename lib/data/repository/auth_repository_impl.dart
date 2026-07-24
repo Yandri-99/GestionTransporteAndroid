@@ -53,6 +53,31 @@ class AuthRepositoryImpl implements AuthRepository {
     return await _storage.hasToken();
   }
 
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    try {
+      final dto = PasswordResetRequestDto(email: email);
+      await _api.post('/api/auth/password-reset/', data: dto.toJson());
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> confirmPasswordReset(String uid, String token, String newPassword, String newPassword2) async {
+    try {
+      final dto = PasswordResetConfirmDto(
+        uid: uid,
+        token: token,
+        newPassword: newPassword,
+        newPassword2: newPassword2,
+      );
+      await _api.post('/api/auth/password-reset/confirm/', data: dto.toJson());
+    } on DioException catch (e) {
+      throw ApiException(_parseError(e.response?.data), statusCode: e.response?.statusCode);
+    }
+  }
+
   String _parseError(dynamic data) {
     if (data == null) return 'Error de conexión';
     if (data is Map && data.containsKey('message')) return data['message'];
